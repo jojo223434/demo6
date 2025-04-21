@@ -33,13 +33,13 @@ public class ChartView {
              Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery("SELECT * FROM readings ORDER BY timestamp DESC LIMIT 144")) {
 
-            int counter = 143;
+            int counter = 0;
             while (rs.next()) {
                 for (int i = 0; i < 6; i++) {
                     double value = rs.getDouble("wtg0" + (i + 1));
                     seriesArray[i].getData().add(new XYChart.Data<>(counter, value));
                 }
-                counter--;
+                counter++;
             }
 
         } catch (SQLException e) {

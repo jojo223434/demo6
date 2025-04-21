@@ -1,10 +1,8 @@
-
 package org.example.demo6;
 
 import eu.hansolo.medusa.Gauge;
 import eu.hansolo.medusa.GaugeBuilder;
 import javafx.application.Application;
-import javafx.application.Platform;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -76,6 +74,8 @@ public class Main extends Application {
         scheduler.scheduleAtFixedRate(() -> {
             DataFetcher.fetchData(windSpeedGauge, windEffectGauge, turbineGauges);
         }, 0, 10, TimeUnit.MINUTES);
+
+        primaryStage.setOnCloseRequest(event -> scheduler.shutdown());
     }
 
     public static void main(String[] args) {

@@ -19,7 +19,6 @@ public class TableViewWindow {
         TableView<Reading> table = new TableView<>();
         ObservableList<Reading> data = FXCollections.observableArrayList();
 
-        // أعمدة
         TableColumn<Reading, String> timestampCol = new TableColumn<>("tiden");
         timestampCol.setCellValueFactory(new PropertyValueFactory<>("timestamp"));
 

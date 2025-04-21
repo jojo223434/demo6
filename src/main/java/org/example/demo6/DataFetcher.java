@@ -8,7 +8,7 @@ import eu.hansolo.medusa.Gauge;
 
 public class DataFetcher {
 
-    private static final String API_URL = "https://vind-og-klima-app.videnomvind.dk/api/v1/live/location/vindtved";
+    private static final String API_URL = "https://vind-og-klima-app.videnomvind.dk/api/stats?location=vindtved";
 
     public static void fetchData(Gauge windSpeedGauge, Gauge windEffectGauge, Gauge[] turbineGauges) {
         HttpClient client = HttpClient.newHttpClient();
@@ -24,26 +24,31 @@ public class DataFetcher {
                         JsonNode root = mapper.readTree(response);
                         JsonNode latest = root.path("latest_reading");
 
+                        if (latest.isMissingNode()) {
+                            System.out.println("No latest reading found in API response.");
+                            return;
+                        }
+
                         double windSpeed = latest.path("wind_speed").asDouble();
                         double windEffect = latest.path("wind_effect").asDouble();
                         JsonNode turbines = latest.path("data").path("turbines");
+
+                        double[] turbineValues = new double[6];
+                        for (int i = 0; i < 6; i++) {
+                            String key = "wtg0" + (i + 1);
+                            turbineValues[i] = turbines.path(key).isMissingNode() ? 0.0 : turbines.path(key).asDouble();
+                        }
+
+                        String timestamp = latest.path("logged_at").asText();
 
                         Platform.runLater(() -> {
                             windSpeedGauge.setValue(windSpeed);
                             windEffectGauge.setValue(windEffect);
                             for (int i = 0; i < 6; i++) {
-                                String key = "wtg0" + (i + 1);
-                                double value = turbines.path(key).asDouble();
-                                turbineGauges[i].setValue(value);
+                                turbineGauges[i].setValue(turbineValues[i]);
                             }
                         });
 
-                        String timestamp = latest.path("logged_at").asText();
-                        double[] turbineValues = new double[6];
-                        for (int i = 0; i < 6; i++) {
-                            String key = "wtg0" + (i + 1);
-                            turbineValues[i] = turbines.path(key).asDouble();
-                        }
                         DatabaseManager.insertReading(timestamp, windSpeed, windEffect, turbineValues);
 
                     } catch (Exception e) {
@@ -51,6 +56,7 @@ public class DataFetcher {
                     }
                 })
                 .exceptionally(e -> {
+                    System.out.println("Failed to fetch data from API.");
                     e.printStackTrace();
                     return null;
                 });
