@@ -50,7 +50,7 @@ public class ChartView {
             lineChart.getData().add(series);
         }
 
-        Scene scene = new Scene(lineChart, 900, 600);
+        Scene scene = new Scene(lineChart, 700, 400);
         stage.setScene(scene);
         stage.show();
     }

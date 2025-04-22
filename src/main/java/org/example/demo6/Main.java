@@ -64,7 +64,7 @@ public class Main extends Application {
 
         VBox root = new VBox(20, title, windSpeedGauge, windEffectGauge, turbineBox, chartBtn, tableBtn);
         root.setAlignment(Pos.CENTER);
-        Scene scene = new Scene(root, 600, 800);
+        Scene scene = new Scene(root, 500, 600);
 
         primaryStage.setTitle("Vindtved Vindmøller App");
         primaryStage.setScene(scene);
